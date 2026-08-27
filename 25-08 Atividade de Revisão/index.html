@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe o CEP</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Informe o CEP</h5>
+      </div>
+      <div class="card-body">
+        <p>Digite o CEP e ao sair o campo o endereço será completado. Pode utilizar a tecla TAB após digitar o CEP.</p>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">Cep:</label>
+          <div class="col-sm-3">
+            <input type="text" id="cep" class="form-control" maxlength="8">
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">Rua:</label>
+          <div class="col-sm-6">
+            <input type="text" id="rua" class="form-control" readonly>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">Bairro:</label>
+          <div class="col-sm-4">
+            <input type="text" id="bairro" class="form-control" readonly>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">Cidade:</label>
+          <div class="col-sm-4">
+            <input type="text" id="cidade" class="form-control" readonly>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">Estado:</label>
+          <div class="col-sm-1">
+            <input type="text" id="estado" class="form-control" readonly>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label">IBGE:</label>
+          <div class="col-sm-3">
+            <input type="text" id="ibge" class="form-control" readonly>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inputCep = document.querySelector('#cep');
+
+    inputCep.addEventListener('keyup', function (evento) {
+      // pega o cep digitado e remove qualquer caractere que não seja número
+      const cep = inputCep.value.replace(/\D/g, '');
+
+      // Enter ou quando completar os 8 dígitos, já busca
+      if (cep.length === 8) {
+        buscarCep(cep);
+      }
+    });
+
+    function buscarCep(cep) {
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(resposta => resposta.json())
+        .then(dados => {
+          if (dados.erro) {
+            alert('CEP não encontrado.');
+            limparCampos();
+            return;
+          }
+          document.querySelector('#rua').value = dados.logradouro;
+          document.querySelector('#bairro').value = dados.bairro;
+          document.querySelector('#cidade').value = dados.localidade;
+          document.querySelector('#estado').value = dados.uf;
+          document.querySelector('#ibge').value = dados.ibge;
+        })
+        .catch(erro => {
+          alert('Erro ao consultar o CEP.');
+          console.log(erro);
+        });
+    }
+
+    function limparCampos() {
+      document.querySelector('#rua').value = '';
+      document.querySelector('#bairro').value = '';
+      document.querySelector('#cidade').value = '';
+      document.querySelector('#estado').value = '';
+      document.querySelector('#ibge').value = '';
+    }
+  </script>
+
+</body>
+</html>
